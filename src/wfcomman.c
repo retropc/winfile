@@ -597,7 +597,7 @@ CreateDirWindow(
 
 
 VOID
-OpenOrEditSelection(HWND hwndActive, BOOL fEdit)
+OpenOrEditSelection(HWND hwndActive, BOOL fEdit, BOOL elevate)
 {
    LPTSTR p;
    BOOL bDir;
@@ -717,7 +717,7 @@ OpenOrEditSelection(HWND hwndActive, BOOL fEdit)
       }
       else
       {
-          ret = ExecProgram(szPath, szNULL, NULL, (GetKeyState(VK_SHIFT) < 0), (GetKeyState(VK_CONTROL) < 0));
+          ret = ExecProgram(szPath, szNULL, NULL, (GetKeyState(VK_SHIFT) < 0), (GetKeyState(VK_CONTROL) < 0) || elevate);
       }
       if (ret)
          MyMessageBox(hwndFrame, IDS_EXECERRTITLE, ret, MB_OK | MB_ICONEXCLAMATION | MB_SYSTEMMODAL);
@@ -949,6 +949,7 @@ AppCommandProc(register DWORD id)
       break;
 
    case IDM_OPEN:
+   case IDM_OPEN_ELEVATED:
 
       if (GetFocus() == hwndDriveList)
          break;  /* user hit Enter in drive list */
@@ -959,14 +960,14 @@ AppCommandProc(register DWORD id)
       {
          TypeAheadString('\0', NULL);
 
-         OpenOrEditSelection(hwndActive, FALSE);
+         OpenOrEditSelection(hwndActive, FALSE, id == IDM_OPEN_ELEVATED);
       }
       break;
 
    case IDM_EDIT:
       TypeAheadString('\0', NULL);
 
-      OpenOrEditSelection(hwndActive, TRUE);
+      OpenOrEditSelection(hwndActive, TRUE, FALSE);
       break;
       
    case IDM_ASSOCIATE:
@@ -1021,6 +1022,7 @@ AppCommandProc(register DWORD id)
       break;
 
    case IDM_STARTCMDSHELL:
+   case IDM_STARTCMDSHELL_ELEVATED:
 	   {
 		   BOOL bRunAs;
 		   BOOL bUseCmd;
@@ -1036,7 +1038,7 @@ AppCommandProc(register DWORD id)
 			if (!bDir && szDir)
 				StripFilespec(szDir);
 	
-		   bRunAs = GetKeyState(VK_SHIFT) < 0;
+		   bRunAs = GetKeyState(VK_SHIFT) < 0 || id == IDM_STARTCMDSHELL_ELEVATED;
 
 		   // check if conemu exists: %ProgramFiles%\ConEmu\ConEmu64.exe
 		   bUseCmd = TRUE;
