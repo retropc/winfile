@@ -789,6 +789,12 @@ CreateSavedWindows()
 
          GetSavedWindow(buf, &win);
 
+         if (!lstrlen(win.szDir)) {
+            lstrcpy(win.szDir, szOriginalDirPath);
+            AddBackslash(win.szDir);
+            lstrcat(win.szDir, szStarDotStar);
+         }
+
          //
          // clean off some junk so we
          // can do this test
