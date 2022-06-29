@@ -1114,6 +1114,25 @@ AppCommandProc(register DWORD id)
 		}
 		break;
 
+   case IDM_EXPLORER:
+   case IDM_EXPLORER_ELEVATED:
+      {
+         BOOL bRunAs;
+         BOOL bDir;
+         LPTSTR szDir;
+
+         szDir = GetSelection(1 | 4 | 16, &bDir);
+         if (!bDir && szDir)
+            StripFilespec(szDir);
+
+         bRunAs = GetKeyState(VK_SHIFT) < 0 || id == IDM_EXPLORER_ELEVATED;
+
+         ret = ExecProgram(L"explorer.exe", NULL, szDir, FALSE, bRunAs);
+         
+         LocalFree(szDir);
+      }
+      break;
+
    case IDM_CLOSEWINDOW:
        {
            HWND      hwndActive;
